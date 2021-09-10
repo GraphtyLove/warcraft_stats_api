@@ -4,6 +4,7 @@ from scrapper.graph.query_handler import gql_query
 from scrapper.graph.queries.encounter import ENCOUNTER_QUERY
 from scrapper.battle_net.character_stats import get_character_stats
 import re
+import unidecode
 
 player_classes_specs: Dict[str, List[str]] = {
     "DeathKnight": [
@@ -129,5 +130,5 @@ def scrap_boss(raid: str, boss: str, player_class: str, player_spec: str, covena
         # Filter players without asian chars.
         if re.match(r"([A-zÀ-ú]+)", player["name"]):
             print(f"Player: {player['name']}  {player['server']['name']}-{player['server']['region']}  => {int(player['amount'])}")
-            server_slug = player['server']['name'].lower().replace(" ", "")
-            get_character_stats(player['server']['regoin'], )
+            stats = get_character_stats(player['server']['region'], player['server']['name'], player['name'])
+            print(stats)
