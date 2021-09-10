@@ -1,0 +1,70 @@
+
+.stat-value {
+    font-weight: bold;
+}
+
+.covenant-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.player-container {
+    margin-bottom: 20px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+/* STATS COLORS */
+.haste {
+    color: #0ed59b
+}
+.mastery {
+    color: #9256ff
+}
+.crit {
+    color: #e01c1c
+}
+.versa {
+    color: #ff8b2d
+}
+
+
+/* CLASSES COLORS */
+.DeathKnight {
+    color: #C41E3A
+}
+.Druid {
+    color: #FF7C0A
+}
+.Hunter {
+    color: #AAD372
+}
+.Mage {
+    color: #3FC7EB
+}
+.Monk {
+    color: #00FF98
+}
+.Paladin {
+    color: #F48CBA
+}
+.Priest {
+    color: #FFFFFF
+}
+.Rogue {
+    color: #FFF468
+}
+.Shaman {
+    color: #0070DD
+}
+.Warlock {
+    color: #8788EE
+}
+.Warrior {
+    color: #C69B6D
+}
+.DemonHunter {
+    color: #A330C9
+}
