@@ -54,6 +54,7 @@ if __name__ == "__main__":
             stats_html = f"""
                 <div class='player-container'>
                     <div class='player-infos'>
+                        {player['rank']}. 
                         <img class='covenant-icon' src='https://assets.rpglogs.com/img/warcraft/abilities/ui_sigil_{covenant_name.lower()}.jpg'>
                         <span class='{class_name} bold'>{player['name']}</span>
                         <span class='realm-name'>{player['server']}</span>
