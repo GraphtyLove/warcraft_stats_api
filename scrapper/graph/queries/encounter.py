@@ -5,7 +5,7 @@ from gql import gql
 # Query top 100 players for an encounter
 ENCOUNTER_QUERY = gql(
     """
-    query worldData ($encounter_id: Int!, $class_name: String!, $spec_name: String!, $difficulty: Int!, $metric: CharacterRankingMetricType, $covenantID: Int!) {
+    query worldData ($encounter_id: Int!, $class_name: String!, $spec_name: String!, $difficulty: Int!, $metric: CharacterRankingMetricType, $covenantID: Int) {
     worldData{
         encounter (id: $encounter_id){
         name

@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 player_classes_specs: Dict[str, List[str]] = {
@@ -64,10 +64,11 @@ player_classes_specs: Dict[str, List[str]] = {
     ]
 }
 
-covenant_ids: Dict[str, int] = {
+covenant_ids: Dict[str, Optional[int]] = {
+    "All": 0,
     "Kyrian": 1,
     "Venthyr": 2,
-    "Night Fae": 3,
+    "NightFae": 3,
     "Necrolord": 4
 }
 

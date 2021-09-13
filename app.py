@@ -47,15 +47,24 @@ if __name__ == "__main__":
 
     # Submit search
     is_scraped = st.button(label="Search")
+    
     if is_scraped:
+
         with st.spinner('Loading data...'):
-            leader_board = scrap_boss(boss_name, class_name, spec_name, covenant_name, difficulty_name, role)
+            # Progress bar
+            progress_bar = st.progress(0)
+            leader_board = scrap_boss(boss_name, class_name, spec_name, covenant_name, difficulty_name, progress_bar, role)
         for player in leader_board:
+            if player['covenant'] == 'All':
+                covenant_icon = "<span></span>"
+            else:
+                covenant_icon = f"<img class='covenant-icon' src='https://assets.rpglogs.com/img/warcraft/abilities/ui_sigil_{player['covenant'].lower()}.jpg'>"
+            
             stats_html = f"""
                 <div class='player-container'>
                     <div class='player-infos'>
-                        {player['rank']}. 
-                        <img class='covenant-icon' src='https://assets.rpglogs.com/img/warcraft/abilities/ui_sigil_{covenant_name.lower()}.jpg'>
+                        <span class='rank'>{player['rank']}.</span>
+                        {covenant_icon}
                         <span class='{class_name} bold'>{player['name']}</span>
                         <span class='realm-name'>{player['server']}</span>
                         <span class='bold'>{player['amount']}</span>

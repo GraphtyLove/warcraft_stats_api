@@ -6,6 +6,7 @@ from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import CharacterNotFound
 from scrapper.warcraft_log.wow_ids import covenant_ids, difficulty_ids
 
+reverted_covenant_id = {v: k for k, v in covenant_ids.items()}
 
 role_metrics: Dict[str, str] = {
     "dps": "dps",
@@ -19,7 +20,7 @@ def format_amount(amount: int) -> str:
     return formatted_with_space
 
 
-def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, difficulty: str, role: str = "dps") -> dict:
+def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, difficulty: str, progress_bar, role: str = "dps") -> dict:
     """
     Function that scrap warcraftlogs.com to get player names.
 
@@ -37,14 +38,19 @@ def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, di
     difficulty_id = difficulty_ids[difficulty]
     role_metric = role_metrics[role]
 
-    leader_board = gql_query(ENCOUNTER_QUERY, {
+
+    query_params = {
         "encounter_id": boss_id,
         "class_name": player_class,
         "spec_name": player_spec,
         "difficulty": difficulty_id,
         "metric":  role_metric,
-        "covenantID": covenant_id
-    })
+    }
+
+    if covenant_id:
+        query_params["covenantID"] = covenant_id
+
+    leader_board = gql_query(ENCOUNTER_QUERY, query_params)
     # Filter the json object to remove 2 lvl of abstraction.
     # Get the list of player with their data.
     leader_board = leader_board["worldData"]["encounter"]["characterRankings"]["rankings"]
@@ -52,6 +58,13 @@ def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, di
     ranking_data = []
 
     for i, player in enumerate(leader_board):
+        progress_bar.progress(i+1)
+        if not player:
+            print("Player NaN, Skiping...")
+            continue
+        if "server" not in player:
+            print("No server, anonymous player.")
+            continue
         # Filter players without asian chars.
         if player["server"]["region"] in ["EU", "US"]:
             try:
@@ -61,9 +74,10 @@ def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, di
             except OSError:
                 print('OS ERROR...')
                 continue
-
+            print(player)
             infos = {
                 "name": player["name"],
+                "covenant": reverted_covenant_id[player['covenantID']],
                 "rank": i,
                 "server": f"{player['server']['name']}-{player['server']['region'].lower()}",
                 "amount": format_amount(int(player["amount"])),
