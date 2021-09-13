@@ -5,4 +5,4 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-CMD ["python", "app.py"]
+CMD ["streamlit", "run", "--server.port", "5000", "app.py"]
