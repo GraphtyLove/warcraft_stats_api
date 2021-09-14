@@ -11,8 +11,8 @@ jobs:
     - name: Deploy to vps perso
       uses: appleboy/ssh-action@master
       with:
-        username: maxim
-        host: 51.210.8.134
-        port: 2030
+        username: ${{ secrets.SSH_USER }}
+        host:  ${{ secrets.SSH_HOST }}
+        port:  ${{ secrets.SSH_PORT }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: 'cd /home/maxim/production/wow-scrapper/.github && ./server_deploy.sh'
