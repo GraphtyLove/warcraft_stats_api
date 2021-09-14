@@ -1,10 +1,13 @@
 from typing import Dict
+
+from scrapper.battle_net.realms_list import get_realm_slug
 from scrapper.warcraft_log.sanctum_of_domination import boss_ids
 from scrapper.graph.query_handler import gql_query
 from scrapper.graph.queries.encounter import ENCOUNTER_QUERY
 from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import CharacterNotFound
 from scrapper.warcraft_log.wow_ids import covenant_ids, difficulty_ids
+from scrapper.get_profils_url import get_character_profile_urls
 
 reverted_covenant_id = {v: k for k, v in covenant_ids.items()}
 
@@ -67,14 +70,21 @@ def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, di
             continue
         # Filter players without asian chars.
         if player["server"]["region"] in ["EU", "US"]:
+            print("PLAYER ", player)
             try:
-                stats = get_character_stats(player['server']['region'], player['server']['name'], player['name'])
+                player_realm_slug = get_realm_slug(player['server']['name'])
+                stats = get_character_stats(player['server']['region'], player_realm_slug, player['name'])
             except CharacterNotFound:
                 continue
             except OSError:
                 print('OS ERROR...')
                 continue
-            print(player)
+            # Get profile URL for raiderIO + Bnet armory
+            bnet_profile_url, raider_io_profile_url = get_character_profile_urls(
+                player["server"]["region"],
+                player_realm_slug,
+                player["name"]
+            )
             infos = {
                 "name": player["name"],
                 "covenant": reverted_covenant_id[player['covenantID']],
@@ -91,6 +101,10 @@ def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, di
                     "agility": round(stats["agility"]["effective"], 2),
                     "strength": round(stats["strength"]["effective"], 2),
 
+                },
+                "profiles": {
+                    "raider_io": raider_io_profile_url,
+                    "bnet_armory": bnet_profile_url
                 }
             }
             print(infos["name"], infos["server"])

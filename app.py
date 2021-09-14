@@ -68,6 +68,10 @@ if __name__ == "__main__":
                         <span class='{class_name} bold'>{player['name']}</span>
                         <span class='realm-name'>{player['server']}</span>
                         <span class='bold'>{player['amount']}</span>
+                        <span class='profile-icons'>
+                           <span> <a target='_blank' href='{player['profiles']['bnet_armory']}'> <img class='covenant-icon' src='https://icon-library.com/images/wow-icon/wow-icon-29.jpg'></a></span>
+                           <span> <a target='_blank' href='{player['profiles']['raider_io']}'> <img class='covenant-icon' src='https://cdnassets.raider.io/images/brand/Icon_2ColorWhite.png'></a></span>
+                        </span>
                     </div>
                     <div class='stats-container'>
                         <span class='crit'>

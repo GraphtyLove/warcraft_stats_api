@@ -1,13 +1,11 @@
 import os
 import requests
-from scrapper.battle_net.realms_list import get_realm_slug
 from scrapper.exceptions import CharacterNotFound
 
 
-def get_character_stats(region: str, realm_name: str, character_name: str) -> dict:
+def get_character_stats(region: str, realm_slug: str, character_name: str) -> dict:
     region = region.lower()
     character_name = character_name.lower()
-    realm_slug = get_realm_slug(realm_name)
     api_endpoint = f"https://{region}.api.blizzard.com/profile/wow/character/{realm_slug}/{character_name}/statistics"
     response = requests.get(
         api_endpoint,
