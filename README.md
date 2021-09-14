@@ -12,6 +12,9 @@ Here are the steps:
 3. The program will query BattleNet API to get stat of each player's character.
 4. web-app will display the restults.
 
+## Deployement
+This repo  is set-up with github actions. Each time you push on `main`, the code will be deployed on production.
+
 ## Installation
 ### Stack
 This app uses:
