@@ -3,6 +3,7 @@ set -e;
 
 echo "Deploying wow scraper...";
 cd /home/maxim/production/wow-scrapper;
+whoami;
 git pull;
 docker build -t wow_scraper;
 docker stop wow_scraper;
