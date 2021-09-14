@@ -1,10 +1,10 @@
 #!/bin/bash
-set -e
+set -e;
 
-echo "Deploying wow scraper..."
-cd /home/maxim/production/wow-scrapper
-git pull
-docker build -t wow_scraper
-docker stop wow_scraper
-docker run -d --env-file .env -p 5000:5000 -t wow_scraper
-echo "🚀 Wow scraper deployed!"
+echo "Deploying wow scraper...";
+cd /home/maxim/production/wow-scrapper;
+git pull;
+docker build -t wow_scraper;
+docker stop wow_scraper;
+docker run -d --env-file .env -p 5000:5000 -t wow_scraper;
+echo "🚀 Wow scraper deployed!";
