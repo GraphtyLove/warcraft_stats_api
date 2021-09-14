@@ -16,3 +16,4 @@ jobs:
         port:  ${{ secrets.SSH_PORT }}
         password: ${{ secrets.SSH_PASSWORD }}
         script: 'cd /home/maxim/production/wow-scrapper/.github && sudo sh ./deploy.sh'
+        key: ${{ secrets.SSH_KEY }}
