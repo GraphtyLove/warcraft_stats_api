@@ -29,7 +29,7 @@ In order to run the project, I used Docker to avoid installation issues.
 All you need to do is:
 
 #### 1. Handle `.env` file 
-Decrypt the `.env.gpg` file to get API secrets. (use the passephrase in the 1password). 
+Decrypt the `.env.gpg` file to get API secrets. (use the passphrase in the 1password). 
 
 **If you don't have it:**
 1. Create a file `.env` *(at the root of the project)*
