@@ -4,7 +4,6 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import os
 import requests
 
-
 def get_Oauth_jwt(client_id: str, client_secret: str, api_url: str) -> str:
     """
     Function that get the JWT from warcraft logs.

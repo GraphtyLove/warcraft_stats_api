@@ -23,31 +23,63 @@ def format_amount(amount: int) -> str:
     return formatted_with_space
 
 
-def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, difficulty: str, progress_bar, role: str = "dps") -> dict:
+def get_characters_list(leader_board: list):
+    player_names = []
+    for i, player in enumerate(leader_board):
+        if not player:
+            print("Player NaN, Skiping...")
+            continue
+        if "server" not in player:
+            print("No server, anonymous player.")
+            continue
+        # Filter players without asian chars.
+        if player["server"]["region"] in ["EU", "US"]:
+            player["rank"] = i + 1
+            player_names.append(player)
+    return player_names
+
+
+def scrap_boss(
+        boss: str,
+        player_class: str,
+        player_spec: str,
+        covenant: str,
+        difficulty: str,
+        progress_bar=None,
+        role: str = "dps",
+        result_per_page: int = 10,
+        pagination: int = 2
+) -> dict:
     """
     Function that scrap warcraftlogs.com to get player names.
 
+    :param progress_bar: Streamlit progress bar the check how fast it goes.
     :param boss: Int corresponding to the boss ID. ex: 2423
     :param player_class: Player class. ex: Shaman
     :param player_spec: Player spec. ex: Elemental
-    :param covenant_: Player covenant id. ex: 3 (fae)
+    :param covenant: Player covenant id. ex: 3 (fae)
     :param difficulty: Boss difficulty (nm, hm, MM). ex: 4 (hm)
-    :param role: dps or heal
+    :param role: dps or heal.
+    :param result_per_page: Number of page per result
+    :param pagination: page number.
     :return:
     """
     # Get IDs
-    boss_id = boss_ids[boss]
-    covenant_id = covenant_ids[covenant]
-    difficulty_id = difficulty_ids[difficulty]
-    role_metric = role_metrics[role]
-
+    try:
+        boss_id = boss_ids[boss]
+        covenant_id = covenant_ids[covenant]
+        difficulty_id = difficulty_ids[difficulty]
+        role_metric = role_metrics[role]
+    except KeyError as ex:
+        print(ex)
+        return {"error": f"Param: {ex} not valid"}
 
     query_params = {
         "encounter_id": boss_id,
         "class_name": player_class,
         "spec_name": player_spec,
         "difficulty": difficulty_id,
-        "metric":  role_metric,
+        "metric": role_metric,
     }
 
     if covenant_id:
@@ -60,53 +92,56 @@ def scrap_boss(boss: str, player_class: str, player_spec: str, covenant: str, di
 
     ranking_data = []
 
-    for i, player in enumerate(leader_board):
-        progress_bar.progress(i+1)
-        if not player:
-            print("Player NaN, Skiping...")
-            continue
-        if "server" not in player:
-            print("No server, anonymous player.")
-            continue
-        # Filter players without asian chars.
-        if player["server"]["region"] in ["EU", "US"]:
-            print("PLAYER ", player)
-            try:
-                player_realm_slug = get_realm_slug(player['server']['name'])
-                stats = get_character_stats(player['server']['region'], player_realm_slug, player['name'])
-            except CharacterNotFound:
-                continue
-            except OSError:
-                print('OS ERROR...')
-                continue
-            # Get profile URL for raiderIO + Bnet armory
-            bnet_profile_url, raider_io_profile_url = get_character_profile_urls(
-                player["server"]["region"],
-                player_realm_slug,
-                player["name"]
-            )
-            infos = {
-                "name": player["name"],
-                "covenant": reverted_covenant_id[player['covenantID']],
-                "rank": i,
-                "server": f"{player['server']['name']}-{player['server']['region'].lower()}",
-                "amount": format_amount(int(player["amount"])),
-                "stats": {
-                    "mastery": round(stats["mastery"]["value"], 2),
-                    "haste": round(stats["spell_haste"]["value"], 2),
-                    "crit": round(stats["spell_crit"]["value"], 2),
-                    "haste": round(stats["spell_haste"]["value"], 2),
-                    "versatility": round(stats["versatility"], 2),
-                    "intellect": round(stats["intellect"]["effective"], 2),
-                    "agility": round(stats["agility"]["effective"], 2),
-                    "strength": round(stats["strength"]["effective"], 2),
+    result_range_start = ((pagination - 1) * result_per_page)
+    result_range_end = pagination * result_per_page
 
-                },
-                "profiles": {
-                    "raider_io": raider_io_profile_url,
-                    "bnet_armory": bnet_profile_url
-                }
+    # Filter players without asian chars and remove anonymous players
+    characters_list = get_characters_list(leader_board)
+    if not characters_list:
+        return {"error": "no character found."}
+
+    for i in range(result_range_start, result_range_end):
+        print(i, result_range_start, result_range_end)
+        player = characters_list[i]
+        if progress_bar:
+            progress_bar.progress(i + 1)
+
+        try:
+            player_realm_slug = get_realm_slug(player['server']['name'])
+            stats = get_character_stats(player['server']['region'], player_realm_slug, player['name'])
+        except CharacterNotFound:
+            progress_bar.progress(i + 1)
+            continue
+        except OSError:
+            print('OS ERROR...')
+            continue
+        # Get profile URL for raiderIO + Bnet armory
+        bnet_profile_url, raider_io_profile_url = get_character_profile_urls(
+            player["server"]["region"],
+            player_realm_slug,
+            player["name"]
+        )
+        infos = {
+            "name": player["name"],
+            "covenant": reverted_covenant_id[player['covenantID']],
+            "rank": player["rank"],
+            "server": f"{player['server']['name']}-{player['server']['region'].lower()}",
+            "amount": format_amount(int(player["amount"])),
+            "stats": {
+                "mastery": round(stats["mastery"]["value"], 2),
+                "haste": round(stats["spell_haste"]["value"], 2),
+                "crit": round(stats["spell_crit"]["value"], 2),
+                "haste": round(stats["spell_haste"]["value"], 2),
+                "versatility": round(stats["versatility"], 2),
+                "intellect": round(stats["intellect"]["effective"], 2),
+                "agility": round(stats["agility"]["effective"], 2),
+                "strength": round(stats["strength"]["effective"], 2),
+            },
+            "profiles": {
+                "raider_io": raider_io_profile_url,
+                "bnet_armory": bnet_profile_url
             }
-            print(infos["name"], infos["server"])
-            ranking_data.append(infos)
+        }
+        print(infos["name"], infos["server"])
+        ranking_data.append(infos)
     return ranking_data

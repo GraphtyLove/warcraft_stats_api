@@ -11,6 +11,8 @@ os.environ["WL_JWT"] = get_Oauth_jwt(os.environ["WL_CLIENT_ID"], os.environ["WL_
 # Generate JWT for BattleNet API.
 os.environ["BN_JWT"] = get_Oauth_jwt(os.environ["BN_CLIENT_ID"], os.environ["BN_CLIENT_SECRET"], os.environ["BN_AUTH_URL"])
 
+import logging
+logging.basicConfig(level=logging.ERROR)
 
 if __name__ == "__main__":
     # Scrap top 100 players on a specific boss. Get dps or hps and player's stats.
@@ -47,13 +49,15 @@ if __name__ == "__main__":
 
     # Submit search
     is_scraped = st.button(label="Search")
+
+    page = st.number_input("Page", step=1, min_value=1)
     
     if is_scraped:
 
         with st.spinner('Loading data...'):
             # Progress bar
             progress_bar = st.progress(0)
-            leader_board = scrap_boss(boss_name, class_name, spec_name, covenant_name, difficulty_name, progress_bar, role)
+            leader_board = scrap_boss(boss_name, class_name, spec_name, covenant_name, difficulty_name, progress_bar, role, pagination=page)
         for player in leader_board:
             if player['covenant'] == 'All':
                 covenant_icon = "<span></span>"
@@ -90,3 +94,4 @@ if __name__ == "__main__":
                 </div>
                 """
             st.markdown(stats_html, unsafe_allow_html=True)
+
