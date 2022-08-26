@@ -34,7 +34,7 @@ def home():
     return "alive"
 
 
-@app.get("/mythicplus")
+@app.get("/mythic-plus")
 def mythicplus(
         class_name: ClassName,
         spec_name: SpecName,
@@ -57,8 +57,8 @@ def raid_scraper(
         covenant_name: CovenantName,
         difficulty_name: RaidDifficulty,
         role: PlayerRole,
-        result_per_page: int = 10,
-        page: int = 1
+        result_per_page: int = Query(title="Max characters per page", gt=0, le=50, default=10),
+        page: int = Query(title="Page number", gt=0, default=1)
 ) -> SuccessResponse | ErrorResponse:
     """
     Route that will scrap top 100 players on a specific boss with specific conditions.
@@ -81,13 +81,3 @@ def raid_scraper(
 
     return {"data": leader_board}
 
-
-
-
-# # * -------------------- RUN SERVER -------------------- *
-# if __name__ == "__main__":
-#     # * --- DEBUG MODE: --- *
-#     # app.run(host="0.0.0.0", debug=True)
-#     # * --- PROD MODE: --- *
-#     port = os.environ.get("PORT", 5000)
-#     app.run(host='0.0.0.0', port=port)
