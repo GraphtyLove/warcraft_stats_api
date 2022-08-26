@@ -1,9 +1,21 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+import asyncio
+
+from fastapi import FastAPI, Path, Query
 import os
-from jwt_utils.check_jwt import check_jwt
+
+from custom_types.api_response import ErrorResponse, SuccessResponse
+from custom_types.class_and_specs import ClassName, SpecName
+from custom_types.player_role_types import PlayerRole
+from custom_types.raid_types import RaidName, BossName, RaidDifficulty
+from custom_types.region import Region
+from custom_types.shadowland_types import CovenantName
 from scrapper.graph.query_handler import get_Oauth_jwt
+from scrapper.raider_io.mythic_plus_leaderboard import get_leaderboard_for_class_and_spec
 from scrapper.warcraft_log.warcraft_log_scrapper import scrap_boss
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # Generate a JWT for warcraft log that expire in 120 days.
 os.environ["WL_JWT"] = get_Oauth_jwt(os.environ["WL_CLIENT_ID"], os.environ["WL_CLIENT_SECRET"], os.environ["WL_AUTH_URL"])
@@ -11,13 +23,10 @@ os.environ["WL_JWT"] = get_Oauth_jwt(os.environ["WL_CLIENT_ID"], os.environ["WL_
 os.environ["BN_JWT"] = get_Oauth_jwt(os.environ["BN_CLIENT_ID"], os.environ["BN_CLIENT_SECRET"], os.environ["BN_AUTH_URL"])
 
 
-app = Flask(__name__)
-# Enable cors
-CORS(app)
+app = FastAPI()
 
 
-
-@app.route("/", methods=["GET"])
+@app.get("/")
 def home():
     """
     Route to check if the server  runs.
@@ -25,41 +34,38 @@ def home():
     return "alive"
 
 
-@app.route("/wow_scraper", methods=["POST"])
-def wow_scraper():
+@app.get("/mythic-plus")
+def mythicplus(
+        class_name: ClassName,
+        spec_name: SpecName,
+        region: Region = "world",
+        season: str = "season-sl-4",
+        max_characters: int = Query(title="Number of Characters checked.", gt=0, le=100, default=60)
+):
+    raider_io_leaderboard = asyncio.run(
+        get_leaderboard_for_class_and_spec(class_name, spec_name, region, season, max_characters)
+    )
+    return {"data": raider_io_leaderboard}
+
+
+@app.get("/raid")
+def raid_scraper(
+        raid_name: RaidName,
+        boss_name: BossName,
+        player_class: ClassName,
+        player_spec: SpecName,
+        covenant_name: CovenantName,
+        difficulty_name: RaidDifficulty,
+        role: PlayerRole,
+        result_per_page: int = Query(title="Max characters per page", gt=0, le=50, default=10),
+        page: int = Query(title="Page number", gt=0, default=1)
+) -> SuccessResponse | ErrorResponse:
     """
     Route that will scrap top 100 players on a specific boss with specific conditions.
     """
-
-    encoded_jwt = request.headers.get('Authorization', None)
-    if not encoded_jwt:
-        return jsonify({"error": "User not connected."})
-
-    is_token_valid = check_jwt(encoded_jwt.replace("Bearer ", ""))
-    if not is_token_valid:
-        return jsonify({"error": "Invalid token."})
-
-    try:
-        # Get params from request
-        boss_name = request.json.get("boss_name").strip()
-        player_class = request.json.get("player_class").strip()
-        player_spec = request.json.get("player_spec").strip()
-        covenant_name = request.json.get("covenant_name").strip()
-        difficulty_name = request.json.get("difficulty_name").strip()
-        role = request.json.get("role").strip()
-    except AttributeError:
-        return jsonify({"error": "param missing"})
-    try:
-        result_per_page = int(request.json.get("result_per_page").strip())
-    except AttributeError:
-        result_per_page = 10
-    try:
-        pagination = int(request.json.get("pagination").strip())
-    except AttributeError:
-        pagination = 1
-
     # Scrap data.
     leader_board = scrap_boss(
+        raid_name,
         boss_name,
         player_class,
         player_spec,
@@ -67,18 +73,11 @@ def wow_scraper():
         difficulty_name,
         role=role,
         result_per_page=result_per_page,
-        pagination=pagination
+        pagination=page
     )
+    # In case scrap_boss return an error
+    if isinstance(leader_board, str):
+        return {"error": leader_board}
 
-    return jsonify({"data": leader_board})
+    return {"data": leader_board}
 
-
-
-
-# * -------------------- RUN SERVER -------------------- *
-if __name__ == "__main__":
-    # * --- DEBUG MODE: --- *
-    # app.run(host="0.0.0.0", debug=True)
-    # * --- PROD MODE: --- *
-    port = os.environ.get("PORT", 5000)
-    app.run(host='0.0.0.0', port=port)

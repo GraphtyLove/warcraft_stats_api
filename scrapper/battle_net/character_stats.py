@@ -1,5 +1,5 @@
 import os
-import requests
+import httpx as requests
 from scrapper.exceptions import CharacterNotFound
 
 

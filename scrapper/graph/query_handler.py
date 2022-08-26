@@ -2,7 +2,7 @@ from typing import Dict, Any
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 import os
-import requests
+import httpx as requests
 
 def get_Oauth_jwt(client_id: str, client_secret: str, api_url: str) -> str:
     """
