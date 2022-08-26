@@ -18,38 +18,38 @@ ClassName = Literal[
 SpecName = Literal[
 	"Unholy",
 	"Frost",
-	"Blood"
+	"Blood",
 	"Restoration",
 	"Balance",
 	"Feral",
 	"Guardian",
 	"BeastMastery",
 	"Marksmanship",
-	"Survival"
+	"Survival",
 	"Arcane",
 	"Fire",
-	"Frost"
+	"Frost",
 	"Brewmaster",
 	"Mistweaver",
-	"Windwalker"
+	"Windwalker",
 	"Holy",
 	"Protection",
-	"Retribution"
+	"Retribution",
 	"Discipline",
 	"Holy",
-	"Shadow"
+	"Shadow",
 	"Assassination",
 	"Subtlety",
-	"Outlaw"
+	"Outlaw",
 	"Elemental",
 	"Enhancement",
-	"Restoration"
+	"Restoration",
 	"Affliction",
 	"Demonology",
-	"Destruction"
+	"Destruction",
 	"Arms",
 	"Fury",
-	"Protection"
+	"Protection",
 	"Havoc",
 	"Vengeance"
 ]
