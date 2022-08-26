@@ -1,5 +1,5 @@
 import os
-import requests
+import httpx as requests
 import json
 
 REALM_MATCHER_FILE_PATH = "scrapper/battle_net/realm_slug_matcher.json"

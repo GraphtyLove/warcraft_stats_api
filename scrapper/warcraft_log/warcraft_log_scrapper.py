@@ -1,13 +1,18 @@
-from typing import Dict
+from typing import Dict, List
 
+from custom_types.class_and_specs import ClassName, SpecName
+from custom_types.player_role_types import PlayerRole
+from custom_types.raid_types import BossName, RaidDifficulty, RaidName
+from custom_types.shadowland_types import CovenantName
 from scrapper.battle_net.realms_list import get_realm_slug
-from scrapper.warcraft_log.sanctum_of_domination import boss_ids
+from scrapper.warcraft_log.ids_lists.boss_list import boss_ids
 from scrapper.graph.query_handler import gql_query
 from scrapper.graph.queries.encounter import ENCOUNTER_QUERY
 from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import CharacterNotFound
-from scrapper.warcraft_log.wow_ids import covenant_ids, difficulty_ids
 from scrapper.get_profils_url import get_character_profile_urls
+from scrapper.warcraft_log.ids_lists.raid_list import raid_difficulty_ids
+from scrapper.warcraft_log.ids_lists.shadowland_specific import covenant_ids
 
 reverted_covenant_id = {v: k for k, v in covenant_ids.items()}
 
@@ -40,20 +45,19 @@ def get_characters_list(leader_board: list):
 
 
 def scrap_boss(
-        boss: str,
-        player_class: str,
-        player_spec: str,
-        covenant: str,
-        difficulty: str,
-        progress_bar=None,
-        role: str = "dps",
+        raid_name: RaidName,
+        boss: BossName,
+        player_class: ClassName,
+        player_spec: SpecName,
+        covenant: CovenantName,
+        difficulty: RaidDifficulty,
+        role: PlayerRole = "dps",
         result_per_page: int = 10,
         pagination: int = 2
-) -> dict:
+) -> List[Dict] | str:
     """
     Function that scrap warcraftlogs.com to get player names.
 
-    :param progress_bar: Streamlit progress bar the check how fast it goes.
     :param boss: Int corresponding to the boss ID. ex: 2423
     :param player_class: Player class. ex: Shaman
     :param player_spec: Player spec. ex: Elemental
@@ -66,13 +70,13 @@ def scrap_boss(
     """
     # Get IDs
     try:
-        boss_id = boss_ids[boss]
+        boss_id = boss_ids[raid_name][boss]
         covenant_id = covenant_ids[covenant]
-        difficulty_id = difficulty_ids[difficulty]
+        difficulty_id = raid_difficulty_ids[difficulty]
         role_metric = role_metrics[role]
     except KeyError as ex:
         print(ex)
-        return {"error": f"Param: {ex} not valid"}
+        return f"Param: {ex} not valid"
 
     query_params = {
         "encounter_id": boss_id,
@@ -98,19 +102,15 @@ def scrap_boss(
     # Filter players without asian chars and remove anonymous players
     characters_list = get_characters_list(leader_board)
     if not characters_list:
-        return {"error": "no character found."}
+        return "no character found."
 
     for i in range(result_range_start, result_range_end):
         print(i, result_range_start, result_range_end)
         player = characters_list[i]
-        if progress_bar:
-            progress_bar.progress(i + 1)
-
         try:
             player_realm_slug = get_realm_slug(player['server']['name'])
             stats = get_character_stats(player['server']['region'], player_realm_slug, player['name'])
         except CharacterNotFound:
-            progress_bar.progress(i + 1)
             continue
         except OSError:
             print('OS ERROR...')

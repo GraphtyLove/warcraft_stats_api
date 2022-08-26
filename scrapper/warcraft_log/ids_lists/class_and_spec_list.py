@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional
 
 
-player_classes_specs: Dict[str, List[str]] = {
+classes_specs_ids: Dict[str, List[str]] = {
     "DeathKnight": [
         "Unholy",
         "Frost",
@@ -62,25 +62,4 @@ player_classes_specs: Dict[str, List[str]] = {
         "Havoc",
         "Vengeance"
     ]
-}
-
-covenant_ids: Dict[str, Optional[int]] = {
-    "All": 0,
-    "Kyrian": 1,
-    "Venthyr": 2,
-    "NightFae": 3,
-    "Necrolord": 4
-}
-
-raid_ids: Dict[str, int] = {
-    "Mythic+ Dungeons": 25,
-    "Castle Nathria": 26,
-    "Sanctum of Domination": 28
-}
-
-difficulty_ids: Dict[str, int] = {
-    "LFR": 1,
-    "Normal": 3,
-    "Heroic": 4,
-    "Mythic": 5
 }
