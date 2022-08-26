@@ -16,9 +16,10 @@ from scrapper.warcraft_log.ids_lists.shadowland_specific import covenant_ids
 
 reverted_covenant_id = {v: k for k, v in covenant_ids.items()}
 
-role_metrics: Dict[str, str] = {
+role_metrics: Dict[PlayerRole, str] = {
     "dps": "dps",
-    "heal": "hps"
+    "heal": "hps",
+    "tank": "dps"
 }
 
 
@@ -127,16 +128,7 @@ def scrap_boss(
             "rank": player["rank"],
             "server": f"{player['server']['name']}-{player['server']['region'].lower()}",
             "amount": format_amount(int(player["amount"])),
-            "stats": {
-                "mastery": round(stats["mastery"]["value"], 2),
-                "haste": round(stats["spell_haste"]["value"], 2),
-                "crit": round(stats["spell_crit"]["value"], 2),
-                "haste": round(stats["spell_haste"]["value"], 2),
-                "versatility": round(stats["versatility"], 2),
-                "intellect": round(stats["intellect"]["effective"], 2),
-                "agility": round(stats["agility"]["effective"], 2),
-                "strength": round(stats["strength"]["effective"], 2),
-            },
+            "stats": stats,
             "profiles": {
                 "raider_io": raider_io_profile_url,
                 "bnet_armory": bnet_profile_url
