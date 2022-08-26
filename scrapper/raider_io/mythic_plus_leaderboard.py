@@ -34,7 +34,7 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 		character_data = character.get("character", {})
 		realm_data = character_data.get("realm")
 
-		covenant_icon_slug = character_data.get("covenant", {}).get("icon"),
+		covenant_icon_slug = character_data.get("covenant", {}).get("icon")
 		realm_region = character_data.get("region").get("slug")
 		bnet_profile_url, raider_io_profile_url = get_character_profile_urls(realm_region, realm_data.get("slug"),
 		                                                                     character_data.get("name"))
