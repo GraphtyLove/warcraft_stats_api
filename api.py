@@ -1,3 +1,4 @@
+import asyncio
 from typing import Dict, Literal
 
 from fastapi import FastAPI
@@ -7,8 +8,10 @@ from custom_types.api_response import ErrorResponse, SuccessResponse
 from custom_types.class_and_specs import ClassName, SpecName
 from custom_types.player_role_types import PlayerRole
 from custom_types.raid_types import RaidName, BossName, RaidDifficulty
+from custom_types.region import Region
 from custom_types.shadowland_types import CovenantName
 from scrapper.graph.query_handler import get_Oauth_jwt
+from scrapper.raider_io.mythic_plus_leaderboard import get_leaderboard_for_class_and_spec
 from scrapper.warcraft_log.warcraft_log_scrapper import scrap_boss
 from dotenv import load_dotenv
 from requests import request
@@ -33,8 +36,25 @@ def home():
     return "alive"
 
 
+@app.get("/mythicplus")
+def mythicplus(
+        class_name: ClassName,
+        spec_name: SpecName,
+        region: Region = "world",
+        season: str = "season-sl-4",
+        max_players: int = 60
+):
+    if max_players > 100:
+        return {"error": "max_player range can't exceed 100!"}
+
+    raider_io_leaderboard = asyncio.run(
+        get_leaderboard_for_class_and_spec(class_name, spec_name, region, season, max_players)
+    )
+    return {"data": raider_io_leaderboard}
+
+
 @app.get("/raid")
-def wow_scraper(
+def raid_scraper(
         raid_name: RaidName,
         boss_name: BossName,
         player_class: ClassName,
