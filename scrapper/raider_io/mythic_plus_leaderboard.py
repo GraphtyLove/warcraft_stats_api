@@ -1,6 +1,7 @@
 import asyncio
 from math import ceil
 from typing import Dict, List
+
 from httpx import AsyncClient
 
 from custom_types.class_and_specs import ClassName, SpecName
@@ -52,11 +53,11 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 
 async def get_leaderboard_for_class_and_spec(
 		class_name: ClassName, spec_name: SpecName, region: Region = "world", season: str = "season-sl-4",
-		max_players: int = 60
+		max_characters: int = 60
 ) -> List[Dict]:
 	# RaiderIo API returns 20 players per page
 	player_per_page = 20
-	number_of_pages = ceil(max_players / player_per_page)
+	number_of_pages = ceil(max_characters / player_per_page)
 
 	leaderboard = []
 	tasks = []

@@ -1,7 +1,6 @@
 import asyncio
-from typing import Dict, Literal
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Path, Query
 import os
 
 from custom_types.api_response import ErrorResponse, SuccessResponse
@@ -14,7 +13,6 @@ from scrapper.graph.query_handler import get_Oauth_jwt
 from scrapper.raider_io.mythic_plus_leaderboard import get_leaderboard_for_class_and_spec
 from scrapper.warcraft_log.warcraft_log_scrapper import scrap_boss
 from dotenv import load_dotenv
-from requests import request
 
 # Load .env file
 load_dotenv()
@@ -42,13 +40,10 @@ def mythicplus(
         spec_name: SpecName,
         region: Region = "world",
         season: str = "season-sl-4",
-        max_players: int = 60
+        max_characters: int = Query(title="Number of Characters checked.", gt=0, le=100, default=60)
 ):
-    if max_players > 100:
-        return {"error": "max_player range can't exceed 100!"}
-
     raider_io_leaderboard = asyncio.run(
-        get_leaderboard_for_class_and_spec(class_name, spec_name, region, season, max_players)
+        get_leaderboard_for_class_and_spec(class_name, spec_name, region, season, max_characters)
     )
     return {"data": raider_io_leaderboard}
 
