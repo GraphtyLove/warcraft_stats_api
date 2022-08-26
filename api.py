@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Query
 import os
 
 from custom_types.api_response import ErrorResponse, SuccessResponse
@@ -10,7 +10,10 @@ from custom_types.raid_types import RaidName, BossName, RaidDifficulty
 from custom_types.region import Region
 from custom_types.shadowland_types import CovenantName
 from scrapper.graph.query_handler import get_Oauth_jwt
-from scrapper.raider_io.mythic_plus_leaderboard import get_leaderboard_for_class_and_spec
+from scrapper.raider_io.mythic_plus_leaderboard import (
+    get_leaderboard_for_class_and_spec,
+    add_character_stats_to_leaderboard
+)
 from scrapper.warcraft_log.warcraft_log_scrapper import scrap_boss
 from dotenv import load_dotenv
 
@@ -35,7 +38,7 @@ def home():
 
 
 @app.get("/mythic-plus")
-def mythicplus(
+def mythic_plus(
         class_name: ClassName,
         spec_name: SpecName,
         region: Region = "world",
