@@ -22,14 +22,24 @@ async def get_character_stats(region: str, realm_slug: str, character_name: str,
             print(f"Skipping {character_name}  {region}-{realm_slug}. 404")
             raise CharacterNotFound()
         return {
-            "mastery": round(response_json["mastery"]["value"], 2),
-            "haste": round(response_json["spell_haste"]["value"], 2),
-            "crit": round(response_json["spell_crit"]["value"], 2),
-            "haste": round(response_json["spell_haste"]["value"], 2),
-            "versatility": round(response_json["versatility"], 2),
-            "intellect": round(response_json["intellect"]["effective"], 2),
-            "agility": round(response_json["agility"]["effective"], 2),
-            "strength": round(response_json["strength"]["effective"], 2),
+            "mastery": {
+                "percentage": round(response_json["mastery"]["value"], 2),
+                "value": round(response_json["mastery"]["rating"])
+            },
+            "haste": {
+                "percentage": round(response_json["spell_haste"]["value"], 2),
+                "value": round(response_json["spell_haste"]["rating"], 2)
+            },
+            "crit": {
+                "percentage": round(response_json["spell_crit"]["value"], 2),
+                "value": round(response_json["spell_crit"]["rating"], 2)
+            },
+            "versatility": {"value": round(response_json["versatility"], 2)},
+            "main_stats": {
+                "intellect": {"value": round(response_json["intellect"]["effective"], 2)},
+                "agility": {"value": round(response_json["agility"]["effective"], 2)},
+                "strength": {"value": round(response_json["strength"]["effective"], 2)}
+            }
         }
     except BaseException as ex:
         print("STATS FAIL: ", ex)
