@@ -22,23 +22,25 @@ async def get_character_stats(region: str, realm_slug: str, character_name: str,
             print(f"Skipping {character_name}  {region}-{realm_slug}. 404")
             raise CharacterNotFound()
         return {
-            "mastery": {
-                "percentage": round(response_json["mastery"]["value"], 2),
-                "value": round(response_json["mastery"]["rating"])
-            },
-            "haste": {
-                "percentage": round(response_json["spell_haste"]["value"], 2),
-                "value": round(response_json["spell_haste"]["rating"], 2)
-            },
-            "crit": {
-                "percentage": round(response_json["spell_crit"]["value"], 2),
-                "value": round(response_json["spell_crit"]["rating"], 2)
-            },
-            "versatility": {"value": round(response_json["versatility"], 2)},
-            "main_stats": {
-                "intellect": {"value": round(response_json["intellect"]["effective"], 2)},
-                "agility": {"value": round(response_json["agility"]["effective"], 2)},
-                "strength": {"value": round(response_json["strength"]["effective"], 2)}
+            "stats": {
+                "mastery": {
+                    "percentage": round(response_json["mastery"]["value"], 2),
+                    "value": round(response_json["mastery"]["rating"])
+                },
+                "haste": {
+                    "percentage": round(response_json["spell_haste"]["value"], 2),
+                    "value": round(response_json["spell_haste"]["rating"], 2)
+                },
+                "crit": {
+                    "percentage": round(response_json["spell_crit"]["value"], 2),
+                    "value": round(response_json["spell_crit"]["rating"], 2)
+                },
+                "versatility": {"value": round(response_json["versatility"], 2)},
+                "main_stats": {
+                    "intellect": {"value": round(response_json["intellect"]["effective"], 2)},
+                    "agility": {"value": round(response_json["agility"]["effective"], 2)},
+                    "strength": {"value": round(response_json["strength"]["effective"], 2)}
+                }
             }
         }
     except BaseException as ex:

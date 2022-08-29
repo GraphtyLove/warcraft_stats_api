@@ -117,10 +117,8 @@ def scrap_boss(
             print('OS ERROR...')
             continue
         # Get profile URL for raiderIO + Bnet armory
-        bnet_profile_url, raider_io_profile_url = get_character_profile_urls(
-            player["server"]["region"],
-            player_realm_slug,
-            player["name"]
+        bnet_profile_url, raider_io_profile_url, warcraft_log_url = get_character_profile_urls(
+            player["server"]["region"], player_realm_slug, player["name"]
         )
         infos = {
             "name": player["name"],
@@ -131,7 +129,8 @@ def scrap_boss(
             "stats": stats,
             "profiles": {
                 "raider_io": raider_io_profile_url,
-                "bnet_armory": bnet_profile_url
+                "bnet_armory": bnet_profile_url,
+                "warcraft_log": warcraft_log_url
             }
         }
         print(infos["name"], infos["server"])

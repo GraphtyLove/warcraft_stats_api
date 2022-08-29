@@ -6,6 +6,7 @@ from httpx import AsyncClient, Client
 
 from custom_types.class_and_specs import ClassName, SpecName
 from custom_types.region import Region
+from scrapper.battle_net.character_details import get_character_details
 from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import ApiDataError
 from scrapper.get_profils_url import get_character_profile_urls
@@ -36,8 +37,9 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 
 		covenant_icon_slug = character_data.get("covenant", {}).get("icon")
 		realm_region = character_data.get("region").get("slug")
-		bnet_profile_url, raider_io_profile_url = get_character_profile_urls(realm_region, realm_data.get("slug"),
-		                                                                     character_data.get("name"))
+		bnet_profile_url, raider_io_profile_url, warcraft_log_url = get_character_profile_urls(
+			realm_region, realm_data.get("slug"), character_data.get("name")
+		)
 		formatted_characters.append({
 			"name": character_data.get("name"),
 			"region": realm_region,
@@ -45,7 +47,8 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 			"realm_slug": realm_data.get("slug"),
 			"profiles": {
 				"raider_io": raider_io_profile_url,
-				"bnet_armory": bnet_profile_url
+				"bnet_armory": bnet_profile_url,
+				"warcraft_log": warcraft_log_url
 			},
 			"rank": character.get("rank"),
 			"score": character.get("score"),
@@ -95,16 +98,18 @@ async def add_character_stats_to_leaderboard(leaderboard: List[Dict]) -> List[Di
 	async with AsyncClient(timeout=50000000) as client:
 		for character in leaderboard:
 			tasks.append(asyncio.create_task(
-				get_character_stats(character.get("region"), character.get("realm_slug"), character.get("name"), client)
+				get_character_details(character.get("region"), character.get("realm_slug"), character.get("name"), client)
 			))
-		characters_stats = await asyncio.gather(*tasks)
+		characters_details = await asyncio.gather(*tasks)
 
-	if len(leaderboard) != len(characters_stats):
+	if len(leaderboard) != len(characters_details):
 		print(f"ERROR: Not all characters' stats found. "
-		      f"leaderboard has len: {len(leaderboard)} and characters_stats has len: {len(characters_stats)}")
+		      f"leaderboard has len: {len(leaderboard)} and characters_details has len: {len(characters_details)}")
 
-	for character_data, character_stats in zip(leaderboard, characters_stats):
-		character_data["stats"] = character_stats
+	for character_data, character_details in zip(leaderboard, characters_details):
+		print("DETAIIIIIIILS: ", character_details)
+		character_data["stats"] = character_details["stats"]
+		character_data["spec"] = character_details["spec"]
 
 	return leaderboard
 

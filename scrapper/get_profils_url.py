@@ -1,7 +1,7 @@
 from typing import Tuple
 
 
-def get_character_profile_urls(region: str, realm: str, character_name: str) -> Tuple[str, str]:
+def get_character_profile_urls(region: str, realm: str, character_name: str) -> Tuple[str, str, str]:
     """
     Function that generate character's profile for raiderIO and Bnet aromry.
 
@@ -13,8 +13,8 @@ def get_character_profile_urls(region: str, realm: str, character_name: str) -> 
     bnet_armory_profile = f"https://worldofwarcraft.com/en-us/character/{region.lower()}/{realm}/{character_name}"
     raider_io_profile = f"https://raider.io/characters/{region.lower()}/{realm}/{character_name}"
     # TODO: Find a quick way to get warcraftlog ID.
-    # warcraft_log_profile = f"https://www.warcraftlogs.com/character/id/{character_id}"
+    warcraft_log_profile = f"https://en.warcraftlogs.com/character/{region}/{realm}/{character_name}"
 
-    return bnet_armory_profile, raider_io_profile,
+    return bnet_armory_profile, raider_io_profile, warcraft_log_profile
 
 
