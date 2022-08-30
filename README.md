@@ -31,6 +31,7 @@ Here are the steps:
 
 This repo is set-up with github actions. Each time you push on `main`, the code will be deployed on production.
 
+
 ## Installation
 
 ### Stack
@@ -42,11 +43,13 @@ This app uses:
     - GraphQL client (request to warcraftLog API).
 - Docker (deployement)
 
+
 ### Run the project locally
 
 In order to run the project, I used Docker to avoid installation issues.
 
 All you need to do is:
+
 
 #### 1. Handle `.env` file 
 
@@ -70,12 +73,14 @@ BN_CLIENT_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 BN_AUTH_URL=https://us.battle.net/oauth/token
 ```
 
+
 #### 2. Build the docker image
 
 Install Docker, launch it, then run:
 ```bash
 docker build -t warcraft_stats_api .
 ```
+
 
 #### 3. Run the docker container
 
@@ -84,10 +89,17 @@ Based on the image created, run the container:
 docker run --env-file .env -p 8000:8000 -t warcraft_stats_api
 ```
 
+
 #### 4. Access the API's documentation!
 
 The API should be accessible at `localhost:8000/docs`
 
+
 #### 5. Access the API!
 
 The API should be accessible at `localhost:8000`
+
+
+## Contributing
+
+If you would like to add something to the project, feel free to open a Pull-Request!
