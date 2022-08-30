@@ -116,7 +116,7 @@ def scrap_boss(
         except OSError:
             print('OS ERROR...')
             continue
-        # Get profile URL for raiderIO + Bnet armory
+        # Get profile URL for raiderIO + Bnet armory + warcraft log
         bnet_profile_url, raider_io_profile_url, warcraft_log_url = get_character_profile_urls(
             player["server"]["region"], player_realm_slug, player["name"]
         )
