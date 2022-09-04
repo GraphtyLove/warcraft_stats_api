@@ -107,7 +107,6 @@ async def add_character_stats_to_leaderboard(leaderboard: List[Dict]) -> List[Di
 		      f"leaderboard has len: {len(leaderboard)} and characters_details has len: {len(characters_details)}")
 
 	for character_data, character_details in zip(leaderboard, characters_details):
-		print("DETAIIIIIIILS: ", character_details)
 		character_data["stats"] = character_details["stats"]
 		character_data["spec"] = character_details["spec"]
 
