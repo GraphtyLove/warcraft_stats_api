@@ -1,13 +1,10 @@
-import asyncio
-from math import ceil
 from typing import Dict, List
 
-from httpx import AsyncClient, Client
+from httpx import Client
 
 from custom_types.class_and_specs import ClassName, SpecName
 from custom_types.region import Region
 from scrapper.battle_net.character_details import get_character_details
-from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import ApiDataError
 from scrapper.get_profils_url import get_character_profile_urls
 from scrapper.http_request import get_request_sync
@@ -58,7 +55,7 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 	return formatted_characters
 
 
-async def get_leaderboard_for_class_and_spec(
+def get_leaderboard_for_class_and_spec(
 		class_name: ClassName, 
 		spec_name: SpecName, 
 		season: str,
@@ -73,24 +70,22 @@ async def get_leaderboard_for_class_and_spec(
 
 	leaderboard = format_leaderboard_page_results(page_data)
 
-	leaderboard_with_stats = await add_character_stats_to_leaderboard(leaderboard)
+	leaderboard_with_stats = add_character_stats_to_leaderboard(leaderboard)
 	return leaderboard_with_stats
 
 
-async def add_character_stats_to_leaderboard(leaderboard: List[Dict]) -> List[Dict]:
+def add_character_stats_to_leaderboard(leaderboard: List[Dict]) -> List[Dict]:
 	"""
 	Function to add stats to each character in the mm+ leaderboard.
 
 	:param leaderboard: A list of characters.
 	:return: The same list of characters with a "stats" key added.
 	"""
-	tasks = []
-	async with AsyncClient(timeout=50000) as client:
+	characters_details = []
+	with Client(timeout=50000) as client:
 		for character in leaderboard:
-			tasks.append(asyncio.create_task(
-				get_character_details(character.get("region"), character.get("realm_slug"), character.get("name"), client)
-			))
-		characters_details = await asyncio.gather(*tasks)
+			character_details = get_character_details(character.get("region"), character.get("realm_slug"), character.get("name"), client)
+			characters_details.append(character_details)
 
 	if len(leaderboard) != len(characters_details):
 		print(f"ERROR: Not all characters' stats found. "

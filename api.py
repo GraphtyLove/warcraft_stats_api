@@ -1,5 +1,3 @@
-import asyncio
-
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import os
@@ -52,15 +50,14 @@ def mythic_plus(
         max_characters: int = Query(title="Number of Characters checked.", gt=0, le=100, default=60),
         page_number: int = Query(title="Page number", gt=0, default=0),
 ):
-    raider_io_leaderboard = asyncio.run(
-        get_leaderboard_for_class_and_spec(
-            class_name, 
-            spec_name, 
-            season, 
-            region, 
-            page_number
-        )
+    raider_io_leaderboard = get_leaderboard_for_class_and_spec(
+        class_name, 
+        spec_name, 
+        season, 
+        region, 
+        page_number
     )
+ 
     return {"data": raider_io_leaderboard, "page": page_number}
 
 

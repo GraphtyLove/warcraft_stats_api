@@ -1,12 +1,11 @@
 import os
-from typing import Dict
 
-from httpx import AsyncClient
+from httpx import Client
 from scrapper.exceptions import CharacterNotFound
-from scrapper.http_request import get_request_async
+from scrapper.http_request import get_request_sync
 
 
-async def get_character_spec(region: str, realm_slug: str, character_name: str, client: AsyncClient) -> dict:
+def get_character_spec(region: str, realm_slug: str, character_name: str, client: Client) -> dict:
 	region = region.lower()
 	character_name = character_name.lower()
 	api_endpoint = f"https://{region}.api.blizzard.com/profile/wow/character/{realm_slug}/" \
@@ -17,7 +16,7 @@ async def get_character_spec(region: str, realm_slug: str, character_name: str, 
 	}
 
 	try:
-		response_json = await get_request_async(url=api_endpoint, client=client, headers=request_headers)
+		response_json = get_request_sync(url=api_endpoint, client=client, headers=request_headers)
 		if not response_json:
 			print(f"Skipping SPEC for: {character_name}  {region}-{realm_slug}. 404")
 			raise CharacterNotFound()
