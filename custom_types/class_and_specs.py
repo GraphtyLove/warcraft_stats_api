@@ -13,6 +13,7 @@ ClassName = Literal[
     "Warlock",
     "Warrior",
     "DemonHunter",
+	"Evoker"
 ]
 
 SpecName = Literal[
@@ -51,5 +52,7 @@ SpecName = Literal[
 	"Fury",
 	"Protection",
 	"Havoc",
-	"Vengeance"
+	"Vengeance",
+	"Devastation",
+	"Preservation"
 ]

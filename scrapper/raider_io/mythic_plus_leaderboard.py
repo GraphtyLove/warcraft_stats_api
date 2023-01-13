@@ -10,11 +10,11 @@ from scrapper.battle_net.character_details import get_character_details
 from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import ApiDataError
 from scrapper.get_profils_url import get_character_profile_urls
-from scrapper.http_request import get_request_async
+from scrapper.http_request import get_request_sync
 
 
 def format_leaderboard_request_url(
-		class_name: ClassName, spec_name: SpecName, region: Region = "world", season: str = "season-sl-4", page: int = 0
+		class_name: ClassName, spec_name: SpecName, region: Region = "world", season: str = "season-df-1", page: int = 1
 ) -> str:
 	return f"https://raider.io/api/mythic-plus/rankings/specs?" \
 	       f"region={region}" \
@@ -35,7 +35,6 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 		character_data = character.get("character", {})
 		realm_data = character_data.get("realm")
 
-		covenant_icon_slug = character_data.get("covenant", {}).get("icon")
 		realm_region = character_data.get("region").get("slug")
 		bnet_profile_url, raider_io_profile_url, warcraft_log_url = get_character_profile_urls(
 			realm_region, realm_data.get("slug"), character_data.get("name")
@@ -53,8 +52,6 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 			"rank": character.get("rank"),
 			"score": character.get("score"),
 			"score_color": character.get("scoreColor"),
-			"covenant": character_data.get("covenant", {}).get("name"),
-			"covenant_icon_url": f"https://cdnassets.raider.io/images/wow/icons/large/{covenant_icon_slug}.jpg",
 			"faction": character_data.get("faction"),
 			"is_connected": realm_data.get("isConnected")
 		})
@@ -62,26 +59,19 @@ def format_leaderboard_page_results(leader_board_result: Dict) -> List[Dict]:
 
 
 async def get_leaderboard_for_class_and_spec(
-		class_name: ClassName, spec_name: SpecName, region: Region = "world", season: str = "season-sl-4",
-		max_characters: int = 60
+		class_name: ClassName, 
+		spec_name: SpecName, 
+		season: str,
+		region: Region, 
+		page_number: int
 ) -> List[Dict]:
 	# RaiderIo API returns 20 players per page
-	player_per_page = 20
-	number_of_pages = ceil(max_characters / player_per_page)
-
 	leaderboard = []
-	tasks = []
-	async with AsyncClient(timeout=5000) as client:
-		for page_number in range(number_of_pages):
-			page_url = format_leaderboard_request_url(class_name, spec_name, region, season, page_number)
-			tasks.append(asyncio.create_task(
-				get_request_async(url=page_url, client=client)
-			))
+	page_url = format_leaderboard_request_url(class_name, spec_name, region, season, page_number)
+	page_data = get_request_sync(url=page_url)
+	print(page_data)
 
-		pages_data = await asyncio.gather(*tasks)
-
-	for page_data in pages_data:
-		leaderboard.extend(format_leaderboard_page_results(page_data))
+	leaderboard = format_leaderboard_page_results(page_data)
 
 	leaderboard_with_stats = await add_character_stats_to_leaderboard(leaderboard)
 	return leaderboard_with_stats
@@ -95,7 +85,7 @@ async def add_character_stats_to_leaderboard(leaderboard: List[Dict]) -> List[Di
 	:return: The same list of characters with a "stats" key added.
 	"""
 	tasks = []
-	async with AsyncClient(timeout=50000000) as client:
+	async with AsyncClient(timeout=50000) as client:
 		for character in leaderboard:
 			tasks.append(asyncio.create_task(
 				get_character_details(character.get("region"), character.get("realm_slug"), character.get("name"), client)

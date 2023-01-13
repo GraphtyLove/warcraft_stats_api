@@ -9,12 +9,8 @@ from custom_types.class_and_specs import ClassName, SpecName
 from custom_types.player_role_types import PlayerRole
 from custom_types.raid_types import RaidName, BossName, RaidDifficulty
 from custom_types.region import Region
-from custom_types.shadowland_types import CovenantName
 from scrapper.graph.query_handler import get_Oauth_jwt
-from scrapper.raider_io.mythic_plus_leaderboard import (
-    get_leaderboard_for_class_and_spec,
-    add_character_stats_to_leaderboard
-)
+from scrapper.raider_io.mythic_plus_leaderboard import get_leaderboard_for_class_and_spec
 from scrapper.warcraft_log.warcraft_log_scrapper import scrap_boss
 from dotenv import load_dotenv
 
@@ -52,13 +48,20 @@ def mythic_plus(
         class_name: ClassName,
         spec_name: SpecName,
         region: Region = "world",
-        season: str = "season-sl-4",
-        max_characters: int = Query(title="Number of Characters checked.", gt=0, le=100, default=60)
+        season: str =  Query(title="Season", default="season-sl-4"),
+        max_characters: int = Query(title="Number of Characters checked.", gt=0, le=100, default=60),
+        page_number: int = Query(title="Page number", gt=0, default=0),
 ):
     raider_io_leaderboard = asyncio.run(
-        get_leaderboard_for_class_and_spec(class_name, spec_name, region, season, max_characters)
+        get_leaderboard_for_class_and_spec(
+            class_name, 
+            spec_name, 
+            season, 
+            region, 
+            page_number
+        )
     )
-    return {"data": raider_io_leaderboard}
+    return {"data": raider_io_leaderboard, "page": page_number}
 
 
 @app.get("/raid")
@@ -67,7 +70,6 @@ def raid_scraper(
         boss_name: BossName,
         player_class: ClassName,
         player_spec: SpecName,
-        covenant_name: CovenantName,
         difficulty_name: RaidDifficulty,
         role: PlayerRole,
         result_per_page: int = Query(title="Max characters per page", gt=0, le=50, default=10),
@@ -82,7 +84,6 @@ def raid_scraper(
         boss_name,
         player_class,
         player_spec,
-        covenant_name,
         difficulty_name,
         role=role,
         result_per_page=result_per_page,

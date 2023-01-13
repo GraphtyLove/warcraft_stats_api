@@ -3,7 +3,6 @@ from typing import Dict, List
 from custom_types.class_and_specs import ClassName, SpecName
 from custom_types.player_role_types import PlayerRole
 from custom_types.raid_types import BossName, RaidDifficulty, RaidName
-from custom_types.shadowland_types import CovenantName
 from scrapper.battle_net.realms_list import get_realm_slug
 from scrapper.warcraft_log.ids_lists.boss_list import boss_ids
 from scrapper.graph.query_handler import gql_query
@@ -12,9 +11,6 @@ from scrapper.battle_net.character_stats import get_character_stats
 from scrapper.exceptions import CharacterNotFound
 from scrapper.get_profils_url import get_character_profile_urls
 from scrapper.warcraft_log.ids_lists.raid_list import raid_difficulty_ids
-from scrapper.warcraft_log.ids_lists.shadowland_specific import covenant_ids
-
-reverted_covenant_id = {v: k for k, v in covenant_ids.items()}
 
 role_metrics: Dict[PlayerRole, str] = {
     "dps": "dps",
@@ -50,7 +46,6 @@ def scrap_boss(
         boss: BossName,
         player_class: ClassName,
         player_spec: SpecName,
-        covenant: CovenantName,
         difficulty: RaidDifficulty,
         role: PlayerRole = "dps",
         result_per_page: int = 10,
@@ -62,7 +57,6 @@ def scrap_boss(
     :param boss: Int corresponding to the boss ID. ex: 2423
     :param player_class: Player class. ex: Shaman
     :param player_spec: Player spec. ex: Elemental
-    :param covenant: Player covenant id. ex: 3 (fae)
     :param difficulty: Boss difficulty (nm, hm, MM). ex: 4 (hm)
     :param role: dps or heal.
     :param result_per_page: Number of page per result
@@ -72,7 +66,6 @@ def scrap_boss(
     # Get IDs
     try:
         boss_id = boss_ids[raid_name][boss]
-        covenant_id = covenant_ids[covenant]
         difficulty_id = raid_difficulty_ids[difficulty]
         role_metric = role_metrics[role]
     except KeyError as ex:
@@ -86,9 +79,6 @@ def scrap_boss(
         "difficulty": difficulty_id,
         "metric": role_metric,
     }
-
-    if covenant_id:
-        query_params["covenantID"] = covenant_id
 
     leader_board = gql_query(ENCOUNTER_QUERY, query_params)
     # Filter the json object to remove 2 lvl of abstraction.
@@ -122,7 +112,6 @@ def scrap_boss(
         )
         infos = {
             "name": player["name"],
-            "covenant": reverted_covenant_id[player['covenantID']],
             "rank": player["rank"],
             "server": f"{player['server']['name']}-{player['server']['region'].lower()}",
             "amount": format_amount(int(player["amount"])),

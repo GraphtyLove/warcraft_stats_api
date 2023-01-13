@@ -21,7 +21,7 @@ This repo is only the back-end, you can find the front-end (an SPA built with Re
 ## How?
 
 Here are the steps:
-1.  You specify to the API which with boss you want to scrap from and with which class/covenant/spec/dps or heal,...
+1.  You specify to the API which with boss you want to scrap from and with which class/spec/dps or heal,...
 2. The program will query WarcraftLog API to get the top 100 players on this boss with specify params.
 3. The program will query BattleNet API to get stat of each player's character.
 4. The API will display the results.

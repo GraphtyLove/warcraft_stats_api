@@ -1,5 +1,4 @@
 import os
-from typing import Dict
 
 from httpx import AsyncClient
 from scrapper.exceptions import CharacterNotFound
@@ -20,7 +19,7 @@ async def get_character_stats(region: str, realm_slug: str, character_name: str,
         response_json = await get_request_async(url=api_endpoint, client=client, headers=request_headers)
         if not response_json:
             print(f"Skipping {character_name}  {region}-{realm_slug}. 404")
-            raise CharacterNotFound()
+            raise CharacterNotFound(f"[{region}] {character_name}-{realm_slug} not found.")
         return {
             "stats": {
                 "mastery": {
