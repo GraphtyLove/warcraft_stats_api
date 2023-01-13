@@ -48,7 +48,6 @@ def scrap_boss(
         player_spec: SpecName,
         difficulty: RaidDifficulty,
         role: PlayerRole = "dps",
-        result_per_page: int = 10,
         pagination: int = 2
 ) -> List[Dict] | str:
     """
@@ -63,6 +62,7 @@ def scrap_boss(
     :param pagination: page number.
     :return:
     """
+    result_per_page = 20
     # Get IDs
     try:
         boss_id = boss_ids[raid_name][boss]

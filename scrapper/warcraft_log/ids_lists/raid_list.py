@@ -3,8 +3,7 @@ from typing import Dict
 from custom_types.raid_types import RaidDifficulty, RaidName
 
 raid_ids: Dict[RaidName, int] = {
-	"Castle Nathria": 26,
-	"Sanctum Of Domination": 28
+	"Vault of the Incarnates": 31
 }
 
 raid_difficulty_ids: Dict[RaidDifficulty, int] = {

@@ -72,7 +72,6 @@ def raid_scraper(
         player_spec: SpecName,
         difficulty_name: RaidDifficulty,
         role: PlayerRole,
-        result_per_page: int = Query(title="Max characters per page", gt=0, le=50, default=10),
         page: int = Query(title="Page number", gt=0, default=1)
 ) -> SuccessResponse | ErrorResponse:
     """
@@ -86,7 +85,6 @@ def raid_scraper(
         player_spec,
         difficulty_name,
         role=role,
-        result_per_page=result_per_page,
         pagination=page
     )
     # In case scrap_boss return an error
