@@ -69,7 +69,7 @@ def scrap_boss(
         difficulty_id = raid_difficulty_ids[difficulty]
         role_metric = role_metrics[role]
     except KeyError as ex:
-        print(ex)
+        print("Mapper key error: ", ex)
         return f"Param: {ex} not valid"
 
     query_params = {

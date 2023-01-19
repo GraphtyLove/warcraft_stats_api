@@ -66,7 +66,6 @@ def get_leaderboard_for_class_and_spec(
 	leaderboard = []
 	page_url = format_leaderboard_request_url(class_name, spec_name, region, season, page_number)
 	page_data = get_request_sync(url=page_url)
-	print(page_data)
 
 	leaderboard = format_leaderboard_page_results(page_data)
 
