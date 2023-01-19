@@ -85,6 +85,9 @@ def add_character_stats_to_leaderboard(leaderboard: List[Dict]) -> List[Dict]:
 	with Client(timeout=50000) as client:
 		for character in leaderboard:
 			character_details = get_character_details(character.get("region"), character.get("realm_slug"), character.get("name"), client)
+			if not character_details:
+				print(f"SKIPING: Character {character.get('name')} not found.")
+				continue
 			characters_details.append(character_details)
 
 	if len(leaderboard) != len(characters_details):
